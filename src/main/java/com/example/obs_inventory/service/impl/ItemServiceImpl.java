@@ -44,7 +44,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDTO saveItem(ItemDTO dto) {
         Item item = new Item();
         BeanUtils.copyProperties(dto, item);
-        item.setStock(calculateStock(dto.getId())); // Recalculate stock before saving
+//        item.setStock(calculateStock(dto.getId())); // Recalculate stock before saving
         itemRepo.save(item);
         return dto;
     }

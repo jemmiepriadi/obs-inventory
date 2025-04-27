@@ -53,6 +53,7 @@ public class ItemController {
                                     value = "{\n"
                                             + "  \"name\": \"iPhone 15\",\n"
                                             + "  \"price\": 1500\n"
+                                            + "  \"stock\": 10\n"
                                             + "}"
                             )
                     )
@@ -76,6 +77,7 @@ public class ItemController {
                                     value = "{\n"
                                             + "  \"name\": \"iPhone 15 Pro\",\n"
                                             + "  \"price\": 1700\n"
+                                            + "  \"stock\": 10\n"
                                             + "}"
                             )
                     )
