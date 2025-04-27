@@ -1,5 +1,6 @@
 package com.example.obs_inventory.service.impl;
 
+import com.example.obs_inventory.dto.ItemDTO;
 import com.example.obs_inventory.dto.OrderDTO;
 import com.example.obs_inventory.model.Item;
 import com.example.obs_inventory.model.Order;
@@ -42,21 +43,44 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDTO saveOrder(OrderDTO dto) {
-        int currentStock = itemService.calculateStock(dto.getItemId());
-        if (dto.getQty() > currentStock) {
+        if (dto == null) {
+            throw new IllegalArgumentException("Order data must not be null");
+        }
+        if (dto.getItemId() == null) {
+            throw new IllegalArgumentException("Item ID must not be null");
+        }
+        if (dto.getQty() <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+
+        // Get item
+        ItemDTO itemDTO = itemService.getItemById(dto.getItemId());
+        if (itemDTO == null) {
+            throw new RuntimeException("Item not found with id: " + dto.getItemId());
+        }
+
+        if (dto.getQty() > itemDTO.getStock()) {
             throw new RuntimeException("Insufficient stock for item: " + dto.getItemId());
         }
 
+        // Deduct stock
+        itemDTO.setStock(itemDTO.getStock() - dto.getQty());
+        itemService.saveItem(itemDTO);
+
+        // Save order
         Order entity = new Order();
         BeanUtils.copyProperties(dto, entity);
+
         Item item = new Item();
         item.setId(dto.getItemId());
         entity.setItem(item);
 
         Order saved = orderRepo.save(entity);
+
         OrderDTO result = new OrderDTO();
         BeanUtils.copyProperties(saved, result);
         result.setItemId(saved.getItem().getId());
+
         return result;
     }
 
