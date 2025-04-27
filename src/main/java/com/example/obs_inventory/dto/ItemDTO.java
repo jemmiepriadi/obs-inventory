@@ -18,8 +18,8 @@ public class ItemDTO {
     private String name;
 
     @Min(value = 0, message = "Price must be non-negative")
-    private int price;
+    private Integer price;
 
     @Min(value = 0, message = "Stock cannot be negative")
-    private int stock;
+    private Integer stock;
 }

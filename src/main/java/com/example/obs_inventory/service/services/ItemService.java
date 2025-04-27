@@ -14,6 +14,8 @@ public interface ItemService {
 
     ItemDTO saveItem(ItemDTO dto);
 
+    ItemDTO update(ItemDTO dto);
+
     void deleteItem(Long id);
 
     int calculateStock(Long itemId);
