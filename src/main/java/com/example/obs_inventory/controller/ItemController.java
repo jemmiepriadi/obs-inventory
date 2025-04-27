@@ -85,7 +85,7 @@ public class ItemController {
     )
     public ItemDTO updateItem(@PathVariable Long id, @RequestBody ItemDTO itemDTO) {
         itemDTO.setId(id);
-        return itemService.saveItem(itemDTO);
+        return itemService.update(itemDTO);
     }
 
     @DeleteMapping("/{id}")

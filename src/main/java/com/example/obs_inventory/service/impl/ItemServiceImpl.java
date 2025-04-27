@@ -51,13 +51,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDTO update(ItemDTO dto) {
-        Item item = itemRepo.getReferenceById(dto.getId());
-        if(item==null){
-            return null;
-        }
-        if(dto.getName()!=null)item.setName(dto.getName());
-        if(dto.getStock()!=null)item.setStock(dto.getStock());
-        if(dto.getPrice()!=null)item.setPrice(dto.getPrice());
+        Item item = new Item();
+        BeanUtils.copyProperties(dto, item);
 //        item.setStock(calculateStock(dto.getId())); // Recalculate stock before saving
         itemRepo.save(item);
         return dto;

@@ -224,3 +224,6 @@ Caused by: org.h2.mvstore.MVStoreException: The file is locked: D:/Projects/obs-
 	at org.h2.mvstore.SingleFileStore.open(SingleFileStore.java:81)
 	at org.h2.mvstore.MVStore.<init>(MVStore.java:286)
 	... 54 more
+2025-04-27 23:56:12.255551+07:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM ITEM INVENTORY [*]INVENTORY"; SQL statement:
+SELECT * FROM ITEM INVENTORY INVENTORY [42000-232]
