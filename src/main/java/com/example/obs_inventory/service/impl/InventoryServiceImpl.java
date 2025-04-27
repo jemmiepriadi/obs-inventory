@@ -2,6 +2,7 @@ package com.example.obs_inventory.service.impl;
 
 import com.example.obs_inventory.dto.InventoryDTO;
 import com.example.obs_inventory.dto.ItemDTO;
+import com.example.obs_inventory.exception.InsufficientStockException;
 import com.example.obs_inventory.model.Inventory;
 import com.example.obs_inventory.model.Item;
 import com.example.obs_inventory.repository.InventoryRepository;
@@ -60,7 +61,7 @@ public class InventoryServiceImpl implements InventoryService {
             itemDTO.setStock(itemDTO.getStock() + dto.getQty());
         } else if ("W".equals(dto.getType())) {
             if (itemDTO.getStock() < dto.getQty()) {
-                throw new IllegalArgumentException("Not enough stock to withdraw");
+                throw new InsufficientStockException("Insufficient stock for item: " + dto.getItemId());
             }
             itemDTO.setStock(itemDTO.getStock() - dto.getQty());
         }
