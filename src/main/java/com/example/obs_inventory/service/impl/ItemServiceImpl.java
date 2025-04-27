@@ -42,14 +42,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDTO saveItem(ItemDTO dto) {
-        ItemDTO itemDTO = getItemById(dto.getId());
-        if(itemDTO==null)return null;
         Item item = new Item();
-        BeanUtils.copyProperties(itemDTO, item);
-        itemDTO.setStock(dto.getStock()); // ONLY update stock
-        Item saved = itemRepo.save(item);
-
-        return itemDTO;
+        BeanUtils.copyProperties(dto, item);
+        item.setStock(calculateStock(dto.getId())); // Recalculate stock before saving
+        itemRepo.save(item);
+        return dto;.
+        g
     }
 
     @Override
