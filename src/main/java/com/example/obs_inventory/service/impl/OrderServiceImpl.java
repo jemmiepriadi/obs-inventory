@@ -9,6 +9,7 @@ import com.example.obs_inventory.service.services.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepository orderRepo;
 
     @Autowired
+    @Lazy
     private ItemService itemService;
 
     @Override

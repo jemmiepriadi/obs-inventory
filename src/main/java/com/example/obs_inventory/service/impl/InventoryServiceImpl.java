@@ -1,10 +1,12 @@
 package com.example.obs_inventory.service.impl;
 
 import com.example.obs_inventory.dto.InventoryDTO;
+import com.example.obs_inventory.dto.ItemDTO;
 import com.example.obs_inventory.model.Inventory;
 import com.example.obs_inventory.model.Item;
 import com.example.obs_inventory.repository.InventoryRepository;
 import com.example.obs_inventory.service.services.InventoryService;
+import com.example.obs_inventory.service.services.ItemService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 public class InventoryServiceImpl implements InventoryService {
     @Autowired
     private InventoryRepository inventoryRepo;
+    @Autowired
+    private ItemService itemService;
 
     @Override
     public Page<InventoryDTO> getAllInventory(Pageable pageable) {
@@ -36,13 +40,38 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public InventoryDTO saveInventory(InventoryDTO dto) {
+        if (!"T".equals(dto.getType()) && !"W".equals(dto.getType())) {
+            throw new IllegalArgumentException("Inventory type must be 'T' (Top-Up) or 'W' (Withdrawal)");
+        }
+
+        // Use ItemService to get the item
+        ItemDTO itemDTO = itemService.getItemById(dto.getItemId());
+
+        if (itemDTO == null) {
+            log.error("error item not found");
+            return null;
+        }
+
+        if ("T".equals(dto.getType())) {
+            itemDTO.setStock(itemDTO.getStock() + dto.getQty());
+        } else if ("W".equals(dto.getType())) {
+            if (itemDTO.getStock() < dto.getQty()) {
+                throw new IllegalArgumentException("Not enough stock to withdraw");
+            }
+            itemDTO.setStock(itemDTO.getStock() - dto.getQty());
+        }
+
+        // Save the updated item
+        itemService.saveItem(itemDTO);
+        Item item = new Item();
+        BeanUtils.copyProperties(itemDTO, item);
+        // Create and save Inventory
         Inventory entity = new Inventory();
         BeanUtils.copyProperties(dto, entity);
-        Item item = new Item();
-        item.setId(dto.getItemId());
         entity.setItem(item);
 
         Inventory saved = inventoryRepo.save(entity);
+
         InventoryDTO result = new InventoryDTO();
         BeanUtils.copyProperties(saved, result);
         result.setItemId(saved.getItem().getId());
