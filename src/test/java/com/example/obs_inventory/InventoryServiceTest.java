@@ -6,9 +6,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.example.obs_inventory.dto.InventoryDTO;
 import com.example.obs_inventory.dto.ItemDTO;
 import com.example.obs_inventory.dto.OrderDTO;
+import com.example.obs_inventory.exception.InsufficientStockException;
 import com.example.obs_inventory.model.Inventory;
+import com.example.obs_inventory.model.Item;
 import com.example.obs_inventory.repository.InventoryRepository;
 import com.example.obs_inventory.repository.OrderRepository;
+import com.example.obs_inventory.service.impl.InventoryServiceImpl;
 import com.example.obs_inventory.service.services.InventoryService;
 import com.example.obs_inventory.service.services.ItemService;
 import com.example.obs_inventory.service.services.OrderService;
@@ -35,22 +38,20 @@ public class InventoryServiceTest {
     private ItemService itemService;
 
     @InjectMocks
-    private InventoryService inventoryService;
+    private InventoryServiceImpl inventoryService;  // Concrete class
 
     private ItemDTO mockItemDTO;
     private InventoryDTO mockInventoryDTO;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         mockItemDTO = new ItemDTO();
         mockItemDTO.setId(1L);
         mockItemDTO.setStock(100); // Initial stock
 
         mockInventoryDTO = new InventoryDTO();
         mockInventoryDTO.setItemId(1L);
-        mockInventoryDTO.setQty(10);
+        mockInventoryDTO.setQty(10); // Quantity to be updated
         mockInventoryDTO.setType("T"); // Type "T" for Top-Up
     }
 
@@ -65,7 +66,7 @@ public class InventoryServiceTest {
 
         // Verify stock update (100 + 10)
         assertNotNull(result);
-        assertEquals(110, result.getQty());
+        assertEquals(110, result.getQty()); // Verify quantity is updated correctly
         verify(itemService).saveItem(any(ItemDTO.class)); // Ensure item service save was called
     }
 
@@ -78,20 +79,25 @@ public class InventoryServiceTest {
         mockItemDTO.setStock(5); // Only 5 stock available
 
         when(itemService.getItemById(1L)).thenReturn(mockItemDTO);
-        when(itemService.saveItem(any(ItemDTO.class))).thenReturn(mockItemDTO);
 
         // Call the service, expecting an exception
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+        InsufficientStockException exception = assertThrows(InsufficientStockException.class, () -> {
             inventoryService.saveInventory(mockInventoryDTO);
         });
 
-        assertTrue(exception.getMessage().contains("Not enough stock to withdraw"));
+        assertTrue(exception.getMessage().contains("Insufficient stock for item"));
     }
+
 
     @Test
     public void testGetAllInventory() {
+        Item mockItem = new Item();
+        mockItem.setId(1L); // Mock the item ID
+        Inventory mockInventory = new Inventory();
+        mockInventory.setItem(mockItem); // Set a valid item for the inventory
+
         Pageable pageable = PageRequest.of(0, 10);
-        when(inventoryRepository.findAll(pageable)).thenReturn(new PageImpl<>(Collections.singletonList(new Inventory())));
+        when(inventoryRepository.findAll(pageable)).thenReturn(new PageImpl<>(Collections.singletonList(mockInventory)));
 
         Page<InventoryDTO> inventoryPage = inventoryService.getAllInventory(pageable);
 

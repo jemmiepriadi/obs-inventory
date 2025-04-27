@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.example.obs_inventory.dto.ItemDTO;
 import com.example.obs_inventory.model.Item;
 import com.example.obs_inventory.repository.ItemRepository;
+import com.example.obs_inventory.service.impl.ItemServiceImpl;
 import com.example.obs_inventory.service.services.InventoryService;
 import com.example.obs_inventory.service.services.ItemService;
 import com.example.obs_inventory.service.services.OrderService;
@@ -33,18 +34,16 @@ public class ItemServiceTest {
     private OrderService orderService;
 
     @InjectMocks
-    private ItemService itemService;
+    private ItemServiceImpl itemService;  // Concrete class
 
     private ItemDTO mockItemDTO;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
-
         mockItemDTO = new ItemDTO();
         mockItemDTO.setId(1L);
         mockItemDTO.setStock(100); // Initial stock
-        mockItemDTO.setPrice(50);
+        mockItemDTO.setPrice(50); // Price for the item
         mockItemDTO.setName("Test Item");
     }
 
@@ -56,6 +55,7 @@ public class ItemServiceTest {
 
         assertNotNull(result);
         assertEquals("Test Item", result.getName());
+        assertEquals(50, result.getPrice());  // Ensure price is preserved
     }
 
     @Test

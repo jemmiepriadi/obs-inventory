@@ -69,7 +69,8 @@ public class InventoryServiceImpl implements InventoryService {
         // Save the updated item
         itemService.saveItem(itemDTO);
         Item item = new Item();
-        BeanUtils.copyProperties(itemDTO, item);
+        item.setId(itemDTO.getId());
+        item.setStock(itemDTO.getStock());
         // Create and save Inventory
         Inventory entity = new Inventory();
         BeanUtils.copyProperties(dto, entity);
@@ -78,8 +79,10 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory saved = inventoryRepo.save(entity);
 
         InventoryDTO result = new InventoryDTO();
-        BeanUtils.copyProperties(saved, result);
+        result.setId(saved.getId());
         result.setItemId(saved.getItem().getId());
+        result.setQty(saved.getQty());
+        result.setType(saved.getType());
         return result;
     }
 
